@@ -1,0 +1,85 @@
+version: '3'
+services: 
+    hr-worker-pg12:
+        container_name: hr-worker-pg12
+        image: postgres:12-alpine
+        ports: 
+            - 5432:5432
+        networks:
+            - hr-net
+        environment: 
+            - POSTGRES_DB=db_hr_worker
+            - POSTGRES_PASSWORD=1234567
+
+    hr-user-pg12:
+        container_name: hr-user-pg12
+        image: postgres:12-alpine
+        ports: 
+            - 5433:5432
+        networks:
+            - hr-net
+        environment: 
+            - POSTGRES_DB=db_hr_user
+            - POSTGRES_PASSWORD=1234567        
+    
+    hr-pgadmin4:
+        container_name: hr-pgadmin4
+        image: dpage/pgadmin4
+        ports: 
+            - 15432:80
+        networks:
+            - hr-net
+        environment: 
+            - PGADMIN_DEFAULT_EMAIL=abc@email.com
+            - PGADMIN_DEFAULT_PASSWORD=1234567
+
+    hr-config-server:
+        container_name: hr-config-server
+        image: hr-config-server:v1
+        ports: 
+            - 8888:8888
+        networks:
+            - hr-net
+        environment: 
+            - GITHUB_USER=
+            - GITHUB_PASS=
+
+    hr-eureka-server:
+        container_name: hr-eureka-server
+        image: hr-eureka-server:v1
+        ports: 
+            - 8761:8761
+        networks:
+            - hr-net
+    
+    hr-api-gateway-zuul:
+        container_name: hr-api-gateway-zuul
+        image: hr-api-gateway-zuul:v1
+        ports: 
+            - 8765:8765
+        networks:
+            - hr-net
+
+    hr-worker:
+        image: hr-worker:v1
+        networks:
+            - hr-net
+
+    hr-user:
+        image: hr-user:v1
+        networks:
+            - hr-net
+
+    hr-payroll:
+        image: hr-payroll:v1
+        networks:
+            - hr-net
+
+    hr-oauth:
+        image: hr-oauth:v1
+        networks:
+            - hr-net
+    
+networks:
+  hr-net:
+    driver: bridge
